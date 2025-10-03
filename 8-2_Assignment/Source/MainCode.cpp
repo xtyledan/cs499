@@ -1,10 +1,12 @@
-// MainCode.cpp
+#include "PlatformFixes.h"
 #include <GLFW/glfw3.h>
 #include <vector>
-#include <cstdlib>
-#include <ctime>
-#include <algorithm>    // for std::clamp
-#include <cmath>
+#include <chrono>
+#include <iostream>
+#include <algorithm>
+
+#include "GameMath.h"
+#include "Grid.h"
 #include "Brick.h"
 #include "Paddle.h"
 #include "Circle.h"
@@ -14,20 +16,18 @@
 #include "Level.h"
 
 namespace {
-    // simple fixed timestep for power-up falling & bounce feel
     float deltaSeconds() {
         static double last = glfwGetTime();
-        double now = glfwGetTime();
-        float dt = static_cast<float>(now - last);
+        const double now = glfwGetTime();
+        const float dt = static_cast<float>(now - last);
         last = now;
         return dt;
     }
 
     void drawLives(int lives) {
-        // draw small squares at top-left as lives
         for (int i = 0; i < lives; ++i) {
-            float x = -0.98f + i * 0.06f;
-            float y = 0.95f;
+            const float x = -0.98f + i * 0.06f;
+            const float y = 0.95f;
             glColor3f(1.f, 0.f, 0.f);
             glBegin(GL_POLYGON);
             glVertex2f(x + 0.02f, y + 0.02f);
@@ -40,139 +40,132 @@ namespace {
 }
 
 int main() {
-    std::srand(static_cast<unsigned>(std::time(nullptr)));
-
+    // --- init window ---
     if (!glfwInit()) return EXIT_FAILURE;
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    GLFWwindow* window = glfwCreateWindow(480, 480, "Brick Breaker-ish", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(800, 600, "Brick Breaker - Optimized", 0, 0);
     if (!window) { glfwTerminate(); return EXIT_FAILURE; }
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
-    // ---- game state ----
-    std::vector<Circle> balls;
-    std::vector<Brick> bricks;
+    // --- game state ---
+    std::vector<Circle>  balls;
+    std::vector<Brick>   bricks;
     std::vector<PowerUp> powerups;
-    Paddle paddle(0.f, -0.85f, 0.3f, 0.05f);
-
-    int lives = 3;
-    int score = 0;
-    bool requestLaunch = false;
-    bool paused = false;
+    Paddle paddle(0.f, -0.85f, 0.30f, 0.05f);
+    int   lives = 3;
+    bool  requestLaunch = false;
+    bool  paused = false;
 
     buildLevel(bricks);
 
     // start with one ball attached to paddle
-    balls.emplace_back(0, 0, 0.05f, 90.f, 0.012f, 1.f, 1.f, 1.f);
-    balls.front().AttachToPaddle(paddle);
+    balls.emplace_back(0.f, 0.f, 0.05f, 90.f, 0.70f, 1.f, 1.f, 1.f);
+    balls.front().attachToPaddle(paddle);
 
+    UniformGrid grid(16, 16);
+
+    // --- main loop ---
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT);
 
         // input
         processInput(window, balls, paddle, requestLaunch, paused);
         float dt = deltaSeconds();
-        if (paused) dt = 0.f;
+        if (paused) dt = 0.0f;
+
+        // rebuild spatial grid
+        grid.clear();
+        for (int i = 0; i < static_cast<int>(bricks.size()); ++i) {
+            if (bricks[i].state() == ONOFF::ON) {
+                grid.insert(i, bricks[i].transform.position, bricks[i].half);
+            }
+        }
 
         // launch if requested
-        if (requestLaunch && !balls.empty() && balls.front().attachedToPaddle) {
-            balls.front().LaunchUp();
+        if (requestLaunch && !balls.empty() && balls.front().attached) {
+            balls.front().launchUp();
         }
         requestLaunch = false;
 
-        // if ball is attached, keep it riding the paddle
-        for (auto& b : balls) if (b.attachedToPaddle) b.AttachToPaddle(paddle);
+        // keep attached balls riding the paddle
+        for (size_t i = 0; i < balls.size(); ++i) {
+            if (balls[i].attached) balls[i].attachToPaddle(paddle);
+        }
 
         // update balls
-        for (auto& b : balls) {
-            // paddle bounce
-            if (!b.attachedToPaddle &&
-                intersects(b.x, b.y, b.radius * 2.f, b.radius * 2.f,
-                    paddle.x(), paddle.y(), paddle.width(), paddle.height()))
-            {
-                b.BounceOffPaddle(paddle);
-                // nudge above paddle to avoid re-collision stickiness
-                b.y = paddle.y() + paddle.height() / 2.f + b.radius + 0.002f;
-            }
+        size_t collisionChecks = 0;
+        for (std::vector<Circle>::iterator it = balls.begin(); it != balls.end(); ) {
+            Circle& b = *it;
 
-            // brick collisions + scoring + occasional power-ups
-            for (auto& brick : bricks) {
-                ONOFF prev = brick.onoff();
-                b.CheckCollision(&brick);
-                if (prev == ONOFF::ON && brick.onoff() == ONOFF::OFF) {
-                    score += 10;
-                    // 15% chance to spawn a power-up
-                    if ((std::rand() % 100) < 15) {
-                        PowerUp pu;
-                        pu.type = (std::rand() % 2 == 0) ? PowerUpType::ExpandPaddle : PowerUpType::MultiBall;
-                        pu.x = brick.x();
-                        pu.y = brick.y();
-                        powerups.push_back(pu);
-                    }
+            // paddle response
+            b.maybeBounceOffPaddle(paddle);
+
+            // candidate bricks from grid
+            std::vector<int> candidates;
+            grid.query(b.transform.position, Vec2{ b.radius, b.radius }, candidates);
+
+            for (size_t k = 0; k < candidates.size(); ++k) {
+                const int idx = candidates[k];
+                if (idx >= 0 && idx < static_cast<int>(bricks.size())) {
+                    b.collideAndResolve(bricks[idx], dt, collisionChecks);
                 }
             }
 
-            b.MoveOneStep();
+            // integrate
+            b.integrate(dt);
 
-            // bottom-out: lose a life
-            if (b.y - b.radius < -1.f) {
+            // fell below bottom?
+            if (b.transform.position.y - b.radius < -1.f) {
                 lives--;
                 if (lives <= 0) {
-                    // reset everything (basic "game over" loop)
-                    lives = 3; score = 0; powerups.clear();
+                    lives = 3;
+                    powerups.clear();
                     buildLevel(bricks);
                 }
-                // reset to one ball attached to paddle
                 balls.clear();
-                balls.emplace_back(0, 0, 0.05f, 90.f, 0.012f, 1.f, 1.f, 1.f);
-                balls.front().AttachToPaddle(paddle);
-                break; // leave ball loop after reset
+                balls.emplace_back(0.f, 0.f, 0.05f, 90.f, 0.70f, 1.f, 1.f, 1.f);
+                balls.front().attachToPaddle(paddle);
+                break; // restart processing after reset
+            }
+            else {
+                ++it;
             }
 
-            b.DrawCircle();
+            // draw the ball
+            b.draw();
         }
 
-        // check if level cleared (all destructible off)
+        // level cleared? (any destructible left ON)
         bool anyDestructible = false;
-        for (const auto& br : bricks) {
-            if (br.type() == BRICKTYPE::DESTRUCTABLE && br.onoff() == ONOFF::ON) { anyDestructible = true; break; }
+        for (size_t i = 0; i < bricks.size(); ++i) {
+            if (bricks[i].type() == BRICKTYPE::DESTRUCTABLE &&
+                bricks[i].state() == ONOFF::ON) {
+                anyDestructible = true;
+                break;
+            }
         }
         if (!anyDestructible) {
-            buildLevel(bricks); // next level (same layout for now)
-            // give bonus ball speed-up for fun
-            for (auto& b : balls) b.LaunchUp();
+            buildLevel(bricks);
+            for (size_t i = 0; i < balls.size(); ++i)
+                if (!balls[i].attached) balls[i].launchUp();
         }
 
-        // update/draw power-ups and apply on catch
-        for (auto& pu : powerups) {
-            pu.update(dt);
-            if (pu.active && powerUpCaughtByPaddle(pu, paddle)) {
-                pu.active = false;
-                if (pu.type == PowerUpType::ExpandPaddle) {
-                    paddle.expand(1.3f);
-                }
-                else if (pu.type == PowerUpType::MultiBall) {
-                    if (!balls.empty()) {
-                        Circle clone = balls.front();
-                        clone.attachedToPaddle = false;
-                        clone.LaunchUp();
-                        clone.x += 0.05f;
-                        clone.y += 0.02f;
-                        balls.push_back(clone);
-                    }
-                }
-            }
-            pu.render();
-        }
-        // remove inactive
-        powerups.erase(std::remove_if(powerups.begin(), powerups.end(),
-            [](const PowerUp& p) { return !p.active; }), powerups.end());
+        // powerups
+        for (size_t i = 0; i < powerups.size(); ++i) { powerups[i].update(dt); powerups[i].render(); }
+        powerups.erase(
+            std::remove_if(powerups.begin(), powerups.end(),
+                [](const PowerUp& p) { return !p.active; }),
+            powerups.end());
 
-        // render bricks & paddle & HUD
-        for (auto& brick : bricks) brick.drawBrick();
+        // draw bricks and paddle
+        for (size_t i = 0; i < bricks.size(); ++i) bricks[i].drawBrick();
         paddle.drawPaddle();
         drawLives(lives);
+
+        // (optional) simple perf log
+        // std::cout << "collision checks: " << collisionChecks << "\n";
 
         glfwSwapBuffers(window);
         glfwPollEvents();
