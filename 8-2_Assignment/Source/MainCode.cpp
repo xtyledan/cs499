@@ -1,9 +1,11 @@
 #include "PlatformFixes.h"
+#include <windows.h>            // for GetModuleFileNameA
 #include <GLFW/glfw3.h>
 #include <vector>
 #include <chrono>
 #include <iostream>
 #include <algorithm>
+#include <cstdio>
 
 #include "GameMath.h"
 #include "Grid.h"
@@ -14,7 +16,9 @@
 #include "Input.h"
 #include "PowerUp.h"
 #include "Level.h"
+#include "DataAccess.h"
 
+// --------------------- helpers ---------------------
 namespace {
     float deltaSeconds() {
         static double last = glfwGetTime();
@@ -37,7 +41,24 @@ namespace {
             glEnd();
         }
     }
+
+    int countDestructibleON(const std::vector<Brick>& bricks) {
+        int n = 0;
+        for (size_t i = 0; i < bricks.size(); ++i)
+            if (bricks[i].type() == BRICKTYPE::DESTRUCTABLE &&
+                bricks[i].state() == ONOFF::ON) ++n;
+        return n;
+    }
+
+    std::string exeDir() {
+        char path[MAX_PATH]{};
+        GetModuleFileNameA(nullptr, path, MAX_PATH);
+        std::string p = path;
+        size_t pos = p.find_last_of("\\/");
+        return (pos == std::string::npos) ? std::string(".\\") : p.substr(0, pos + 1);
+    }
 }
+// ---------------------------------------------------
 
 int main() {
     // --- init window ---
@@ -49,6 +70,24 @@ int main() {
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
+    // --- database: open / schema / sample settings ---
+    DataAccess db;
+    {
+        const std::string dbPath = exeDir() + "game.db";
+        if (!db.open(dbPath)) {
+            std::cerr << "DB open failed: " << db.lastError() << "\n";
+        }
+        else if (!db.initSchema()) {
+            std::cerr << "DB schema failed: " << db.lastError() << "\n";
+        }
+        else {
+            // store a couple of settings as an example
+            db.setSetting("window_width", "800");
+            db.setSetting("window_height", "600");
+            db.setSetting("vsync", "1");
+        }
+    }
+
     // --- game state ---
     std::vector<Circle>  balls;
     std::vector<Brick>   bricks;
@@ -59,6 +98,11 @@ int main() {
     bool  paused = false;
 
     buildLevel(bricks);
+
+    // score model: points = (initial destructible bricks) - (remaining ON)
+    const int initialDestructible = countDestructibleON(bricks);
+    int       points = 0;
+    const double startTime = glfwGetTime();
 
     // start with one ball attached to paddle
     balls.emplace_back(0.f, 0.f, 0.05f, 90.f, 0.70f, 1.f, 1.f, 1.f);
@@ -119,10 +163,23 @@ int main() {
             // fell below bottom?
             if (b.transform.position.y - b.radius < -1.f) {
                 lives--;
+                // recompute score from remaining bricks
+                points = initialDestructible - countDestructibleON(bricks);
+
                 if (lives <= 0) {
+                    // save a score row
+                    const double endTime = glfwGetTime();
+                    const int durationSec = static_cast<int>(endTime - startTime);
+                    if (!db.addScore("Player1", points, durationSec)) {
+                        std::cerr << "addScore failed: " << db.lastError() << "\n";
+                    }
+
+                    // reset game
                     lives = 3;
                     powerups.clear();
                     buildLevel(bricks);
+                    // reset scoring baseline
+                    points = 0;
                 }
                 balls.clear();
                 balls.emplace_back(0.f, 0.f, 0.05f, 90.f, 0.70f, 1.f, 1.f, 1.f);
@@ -147,6 +204,14 @@ int main() {
             }
         }
         if (!anyDestructible) {
+            // save score for a full-clear
+            points = initialDestructible - 0;
+            const double endTime = glfwGetTime();
+            const int durationSec = static_cast<int>(endTime - startTime);
+            if (!db.addScore("Player1", points, durationSec)) {
+                std::cerr << "addScore failed: " << db.lastError() << "\n";
+            }
+
             buildLevel(bricks);
             for (size_t i = 0; i < balls.size(); ++i)
                 if (!balls[i].attached) balls[i].launchUp();
@@ -164,11 +229,30 @@ int main() {
         paddle.drawPaddle();
         drawLives(lives);
 
-        // (optional) simple perf log
-        // std::cout << "collision checks: " << collisionChecks << "\n";
-
         glfwSwapBuffers(window);
         glfwPollEvents();
+    }
+
+    // On normal window close, record a session score as well
+    {
+        const int remaining = countDestructibleON(bricks);
+        const int finalPoints = initialDestructible - remaining;
+        const int durationSec = static_cast<int>(glfwGetTime()); // since start of program
+        if (!db.addScore("Player1", finalPoints, durationSec)) {
+            // not fatal
+        }
+
+        // Print a simple top-10 leaderboard to the console
+        const std::vector<std::tuple<std::string, int, std::string, int>> top = db.topScores(10);
+        std::cout << "\n=== Top Scores ===\n";
+        for (size_t i = 0; i < top.size(); ++i) {
+            const std::tuple<std::string, int, std::string, int>& row = top[i];
+            std::cout << (i + 1) << ") "
+                << std::get<0>(row) << "  "
+                << std::get<1>(row) << " pts  "
+                << std::get<2>(row) << "  "
+                << std::get<3>(row) << "s\n";
+        }
     }
 
     glfwDestroyWindow(window);
