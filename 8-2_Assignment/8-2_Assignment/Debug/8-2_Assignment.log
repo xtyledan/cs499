@@ -1,87 +1,16 @@
-﻿  MainCode.cpp
-C:\Users\xtyledan\Desktop\CS330Content\Utilities\linmath.h(64,1): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-  (compiling source file 'Source/MainCode.cpp')
-  
-C:\Users\xtyledan\Desktop\CS330Content\Utilities\linmath.h(65,1): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-  (compiling source file 'Source/MainCode.cpp')
-  
-C:\Users\xtyledan\Desktop\CS330Content\Utilities\linmath.h(66,1): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-  (compiling source file 'Source/MainCode.cpp')
-  
-C:\Users\xtyledan\Desktop\CS330Content\Utilities\linmath.h(344,17): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-  (compiling source file 'Source/MainCode.cpp')
-  
-C:\Users\xtyledan\Desktop\CS330Content\Utilities\linmath.h(597,18): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-  (compiling source file 'Source/MainCode.cpp')
-  
-C:\Users\xtyledan\Desktop\CS330Content\Utilities\linmath.h(604,18): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-  (compiling source file 'Source/MainCode.cpp')
-  
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,9): warning C4005: 'APIENTRY': macro redefinition
-  (compiling source file 'Source/MainCode.cpp')
-      C:\Users\xtyledan\Desktop\CS330Content\Libraries\GLFW\include\GLFW\glfw3.h(123,11):
-      see previous definition of 'APIENTRY'
-  
-C:\Users\xtyledan\Desktop\CS330Content\Projects\8-2_Assignment\Source\MainCode.cpp(14,31): warning C4305: 'initializing': truncation from 'double' to 'float'
-C:\Users\xtyledan\Desktop\CS330Content\Projects\8-2_Assignment\Source\MainCode.cpp(57,16): warning C4305: '*=': truncation from 'double' to 'float'
-C:\Users\xtyledan\Desktop\CS330Content\Projects\8-2_Assignment\Source\MainCode.cpp(57,30): warning C4305: '*=': truncation from 'double' to 'float'
-C:\Users\xtyledan\Desktop\CS330Content\Projects\8-2_Assignment\Source\MainCode.cpp(57,43): warning C4305: '*=': truncation from 'double' to 'float'
-C:\Users\xtyledan\Desktop\CS330Content\Projects\8-2_Assignment\Source\MainCode.cpp(65,19): warning C4305: 'initializing': truncation from 'double' to 'float'
-C:\Users\xtyledan\Desktop\CS330Content\Projects\8-2_Assignment\Source\MainCode.cpp(99,12): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\xtyledan\Desktop\CS330Content\Projects\8-2_Assignment\Source\MainCode.cpp(99,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\xtyledan\Desktop\CS330Content\Projects\8-2_Assignment\Source\MainCode.cpp(124,22): warning C4305: '*=': truncation from 'double' to 'float'
-C:\Users\xtyledan\Desktop\CS330Content\Projects\8-2_Assignment\Source\MainCode.cpp(128,22): warning C4305: '*=': truncation from 'double' to 'float'
-C:\Users\xtyledan\Desktop\CS330Content\Projects\8-2_Assignment\Source\MainCode.cpp(146,29): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\xtyledan\Desktop\CS330Content\Projects\8-2_Assignment\Source\MainCode.cpp(146,24): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\xtyledan\Desktop\CS330Content\Projects\8-2_Assignment\Source\MainCode.cpp(146,18): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\xtyledan\Desktop\CS330Content\Projects\8-2_Assignment\Source\MainCode.cpp(166,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-C:\Users\xtyledan\Desktop\CS330Content\Projects\8-2_Assignment\Source\MainCode.cpp(182,40): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\xtyledan\Desktop\CS330Content\Projects\8-2_Assignment\Source\MainCode.cpp(182,35): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\xtyledan\Desktop\CS330Content\Projects\8-2_Assignment\Source\MainCode.cpp(183,42): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\xtyledan\Desktop\CS330Content\Projects\8-2_Assignment\Source\MainCode.cpp(183,37): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\xtyledan\Desktop\CS330Content\Projects\8-2_Assignment\Source\MainCode.cpp(184,43): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\xtyledan\Desktop\CS330Content\Projects\8-2_Assignment\Source\MainCode.cpp(184,31): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\xtyledan\Desktop\CS330Content\Projects\8-2_Assignment\Source\MainCode.cpp(185,41): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\xtyledan\Desktop\CS330Content\Projects\8-2_Assignment\Source\MainCode.cpp(185,35): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\xtyledan\Desktop\CS330Content\Projects\8-2_Assignment\Source\MainCode.cpp(185,28): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\include\xmemory(732,103): warning C4244: 'argument': conversion from '_Ty' to 'float', possible loss of data
-C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\include\xmemory(732,103): warning C4244:         with
-C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\include\xmemory(732,103): warning C4244:         [
-C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\include\xmemory(732,103): warning C4244:             _Ty=double
-C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\include\xmemory(732,103): warning C4244:         ]
-  (compiling source file 'Source/MainCode.cpp')
-      C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\include\xmemory(732,103):
-      the template instantiation context (the oldest one first) is
-          C:\Users\xtyledan\Desktop\CS330Content\Projects\8-2_Assignment\Source\MainCode.cpp(225,15):
-          see reference to function template instantiation 'void std::vector<Circle,std::allocator<Circle>>::emplace_back<int,int,double,int,double,float,float,float>(int &&,int &&,double &&,int &&,double &&,float &&,float &&,float &&)' being compiled
-              C:\Users\xtyledan\Desktop\CS330Content\Projects\8-2_Assignment\Source\MainCode.cpp(225,27):
-              see the first reference to 'std::vector<Circle,std::allocator<Circle>>::emplace_back' in 'processInput'
-          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\include\vector(909,24):
-          see reference to function template instantiation '_Ty &std::vector<_Ty,std::allocator<_Ty>>::_Emplace_one_at_back<int,int,double,int,double,float,float,float>(int &&,int &&,double &&,int &&,double &&,float &&,float &&,float &&)' being compiled
-          with
-          [
-              _Ty=Circle
-          ]
-          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\include\vector(830,20):
-          see reference to function template instantiation '_Ty &std::vector<_Ty,std::allocator<_Ty>>::_Emplace_back_with_unused_capacity<int,int,double,int,double,float,float,float>(int &&,int &&,double &&,int &&,double &&,float &&,float &&,float &&)' being compiled
-          with
-          [
-              _Ty=Circle
-          ]
-          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\include\vector(848,27):
-          see reference to function template instantiation 'void std::_Default_allocator_traits<_Alloc>::construct<_Ty,int,int,double,int,double,float,float,float>(_Alloc &,_Objty *const ,int &&,int &&,double &&,int &&,double &&,float &&,float &&,float &&)' being compiled
-          with
-          [
-              _Alloc=std::allocator<Circle>,
-              _Ty=Circle,
-              _Objty=Circle
-          ]
-  
-C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\include\xmemory(732,103): warning C4244: 'argument': conversion from '_Ty' to 'float', possible loss of data
-C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\include\xmemory(732,103): warning C4244:         with
-C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\include\xmemory(732,103): warning C4244:         [
-C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\include\xmemory(732,103): warning C4244:             _Ty=int
-C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\include\xmemory(732,103): warning C4244:         ]
-  (compiling source file 'Source/MainCode.cpp')
-  
-  8-2_Assignment.vcxproj -> C:\Users\xtyledan\Desktop\CS330Content\Projects\8-2_Assignment\Debug\8-2_Assignment.exe
+﻿MainCode.obj : error LNK2019: unresolved external symbol _glfwInit referenced in function _main
+MainCode.obj : error LNK2019: unresolved external symbol _glfwTerminate referenced in function _main
+MainCode.obj : error LNK2019: unresolved external symbol _glfwWindowHint referenced in function _main
+MainCode.obj : error LNK2019: unresolved external symbol _glfwCreateWindow referenced in function _main
+MainCode.obj : error LNK2019: unresolved external symbol _glfwDestroyWindow referenced in function _main
+MainCode.obj : error LNK2019: unresolved external symbol _glfwWindowShouldClose referenced in function _main
+MainCode.obj : error LNK2019: unresolved external symbol _glfwSetWindowShouldClose referenced in function "void __cdecl processInput(struct GLFWwindow *)" (?processInput@@YAXPAUGLFWwindow@@@Z)
+MainCode.obj : error LNK2019: unresolved external symbol _glfwPollEvents referenced in function _main
+MainCode.obj : error LNK2019: unresolved external symbol _glfwGetKey referenced in function "void __cdecl processInput(struct GLFWwindow *)" (?processInput@@YAXPAUGLFWwindow@@@Z)
+MainCode.obj : error LNK2019: unresolved external symbol _glfwGetTime referenced in function "void __cdecl processInput(struct GLFWwindow *)" (?processInput@@YAXPAUGLFWwindow@@@Z)
+MainCode.obj : error LNK2019: unresolved external symbol _glfwMakeContextCurrent referenced in function _main
+MainCode.obj : error LNK2019: unresolved external symbol _glfwSwapBuffers referenced in function _main
+MainCode.obj : error LNK2019: unresolved external symbol _glfwSwapInterval referenced in function _main
+C:\Libraries\glew-2.2.0\lib\Release\x64\glew32.lib : warning LNK4272: library machine type 'x64' conflicts with target machine type 'x86'
+C:\Libraries\glfw-3.4.bin.WIN64\lib-vc2022\glfw3.lib : warning LNK4272: library machine type 'x64' conflicts with target machine type 'x86'
+C:\Users\xtyledan\Desktop\8-2_Assignment\Debug\8-2_Assignment.exe : fatal error LNK1120: 13 unresolved externals
