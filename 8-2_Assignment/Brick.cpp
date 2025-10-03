@@ -1,27 +1,34 @@
+#include "PlatformFixes.h"
 #include "Brick.h"
 #include <GLFW/glfw3.h>
 
-Brick::Brick(BRICKTYPE bt, float xx, float yy, float ww, float hh,
+Brick::Brick(BRICKTYPE bt, float cx, float cy, float w, float h,
     float rr, float gg, float bb, int hits)
-    : red_(rr), green_(gg), blue_(bb),
-    x_(xx), y_(yy), width_(ww), height_(hh),
-    brick_type_(bt), onoff_(ONOFF::ON), hitCount_(hits) {
+{
+    brick_type_ = bt;
+    transform.position = { cx, cy };
+    half = { w * 0.5f, h * 0.5f };
+    rgb = { rr, gg, bb };
+    health.hp = hits;
+    state_ = ONOFF::ON;
 }
 
 void Brick::drawBrick() const {
-    if (onoff_ == ONOFF::ON) {
-        glColor3d(red_, green_, blue_);
-        glBegin(GL_POLYGON);
-        glVertex2d(x_ + width_ / 2, y_ + height_ / 2);
-        glVertex2d(x_ + width_ / 2, y_ - height_ / 2);
-        glVertex2d(x_ - width_ / 2, y_ - height_ / 2);
-        glVertex2d(x_ - width_ / 2, y_ + height_ / 2);
-        glEnd();
-    }
+    if (state_ == ONOFF::OFF) return;
+    glColor3f(rgb[0], rgb[1], rgb[2]);
+    glBegin(GL_POLYGON);
+    glVertex2f(x() + half.x, y() + half.y);
+    glVertex2f(x() + half.x, y() - half.y);
+    glVertex2f(x() - half.x, y() - half.y);
+    glVertex2f(x() - half.x, y() + half.y);
+    glEnd();
 }
 
 void Brick::hit() {
-    --hitCount_;
-    red_ *= 0.8f; green_ *= 0.8f; blue_ *= 0.8f; // Darken color on hit
-    if (hitCount_ <= 0) onoff_ = ONOFF::OFF;
+    if (state_ == ONOFF::OFF) return;
+    if (brick_type_ == BRICKTYPE::DESTRUCTABLE) {
+        --health.hp;
+        for (auto& c : rgb) c *= 0.85f;
+        if (health.hp <= 0) state_ = ONOFF::OFF;
+    }
 }

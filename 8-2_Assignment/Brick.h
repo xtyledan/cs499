@@ -1,28 +1,35 @@
 #pragma once
+#include <array>
+#include "GameMath.h"   // <-- IMPORTANT: brings Vec2, Transform
 
 enum class BRICKTYPE { REFLECTIVE, DESTRUCTABLE };
 enum class ONOFF { ON, OFF };
 
 class Brick {
 public:
-    Brick(BRICKTYPE bt, float xx, float yy, float ww, float hh,
+    Brick(BRICKTYPE bt, float cx, float cy, float w, float h,
         float rr, float gg, float bb, int hits);
 
     void drawBrick() const;
-    void hit();
 
-    // accessors
-    float x() const { return x_; }
-    float y() const { return y_; }
-    float width()  const { return width_; }
-    float height() const { return height_; }
-    BRICKTYPE type() const { return brick_type_; }
-    ONOFF onoff() const { return onoff_; }
+    // Public data used by the game loop / collision
+    Transform transform;     // center position & velocity (velocity unused for bricks)
+    Vec2      half{ 0.15f, 0.05f }; // half-extents (w/2, h/2)
+    Health    health;
+
+    BRICKTYPE type()  const { return brick_type_; }
+    ONOFF     state() const { return state_; }
+
+    float x() const { return transform.position.x; }
+    float y() const { return transform.position.y; }
+    float w() const { return half.x * 2.0f; }
+    float h() const { return half.y * 2.0f; }
+
+    void hit(); // darken & decrement (turn OFF when <=0 for destructibles)
+
+    std::array<float, 3> rgb{ 1,1,1 };
 
 private:
-    float red_, green_, blue_;
-    float x_, y_, width_, height_;
-    BRICKTYPE brick_type_;
-    ONOFF onoff_;
-    int hitCount_;
+    BRICKTYPE brick_type_{ BRICKTYPE::DESTRUCTABLE };
+    ONOFF     state_{ ONOFF::ON };
 };
