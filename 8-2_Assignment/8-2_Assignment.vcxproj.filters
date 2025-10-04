@@ -30,6 +30,9 @@
     <ClCompile Include="Paddle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DataAccess.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Brick.h">
@@ -60,6 +63,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PlatformFixes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DataAccess.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
